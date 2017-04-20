@@ -241,55 +241,47 @@ int Tablica::sizeTab()
 }
 
 
-void Tablica::quickSort(int lewy,int prawy)
+void Tablica::margeSort(int lewy,int prawy)
 {
-	//int v = tablica[(lewy+prawy)/2];          //element srodkowy jako pivot
-	//int v = tablica[lewy];										//początek tablicy jako pivot
-	int v = tablica[rand() % prawy];
-	int i,j,x;
-	i=lewy;
-	j=prawy;
-		do{
-			while (tablica[i]<v) i++;
-			while (tablica[j]>v) j--;
-			if(i<=j)
-			{
-				x = tablica[i];
-				tablica[i]=tablica[j];
-				tablica[j] = x;
-				i++;
-				j--;
-			}
-		}while (i<=j);
-		if(j>lewy) quickSort(lewy,j);
-		if(i<prawy) quickSort(i,prawy);
+  //gdy mamy jeden element, to jest on już posortowany
+  if(prawy<=lewy) return; 
+ 
+  //znajdujemy srodek podtablicy
+  int srodek = (prawy+lewy)/2;
+ 
+  //dzielimy tablice na częsć lewą i prawa
+  margeSort(lewy, srodek); 
+  margeSort(srodek+1, prawy);
+ 
+  //scalamy dwie już posortowane tablice
+  scal(lewy, srodek, prawy);
 }
 
-/*int i,j,pivot;
-i = *(tablica+((left+right)/2));
-pivot = *(tablica+i);
-*(tablica+i) = *(tablica+right);
-
-for(i=j=left;i<right;i++)
+void Tablica::scal(int lewy, int srodek, int prawy)
 {
-	if(*(tablica+i) < pivot)
-	{
-	swap(*(tablica+i),*(tablica+j));
-	}
+  int i = lewy, j = srodek + 1;
+ 	pom = new int[prawy-lewy];
+
+  //kopiujemy lewą i prawą część tablicy do tablicy pomocniczej
+  for(int i = lewy;i<=prawy; i++) 
+    pom[i] = tablica[i];  
+ 
+  //scalenie dwóch podtablic pomocniczych i zapisanie ich 
+  //we własciwej tablicy
+  for(int k=lewy;k<=prawy;k++) 
+  if(i<=srodek)
+    if(j <= prawy)
+         if(pom[j]<pom[i])
+             tablica[k] = pom[j++];
+         else
+             tablica[k] = pom[i++];
+    else
+        tablica[k] = pom[i++];
+  else
+      tablica[k] = pom[j++];
 }
-*(tablica+right) = *(tablica+j);
-*(tablica+j) = pivot;
-if(left < j-1)
-{
-	quickSort(left,j-1);
-}
-if(j+1 < right)
-{
-	quickSort(j+1,right);
-}*/
 
-
-void Tablica::measureQuickSort()
+void Tablica::measuremargeSort() // zmiana
 {
 	unsigned int quantity;
 	unsigned long int sizeOfTab;
@@ -306,9 +298,11 @@ void Tablica::measureQuickSort()
 		resetTablicy();
 		zwiekszanie_tablicy(sizeOfTab,2);
 		rozmiar = sizeOfTab;
+		wyswietl();
 		pomiar.startPomiar();
-		quickSort(0,sizeTab()-1);
+		margeSort(0,sizeTab()-1);
 		pomiar.koniecPomiar();
+		wyswietl();
 		resetTablicy();
 	}
 
